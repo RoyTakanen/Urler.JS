@@ -4,7 +4,7 @@ const mysql = require('mysql');
 const urlExists = require("url-exists");
 const fs = require('fs');
 
-const port = 8888;
+const port = process.env.PORT || 8888;
 
 function yhdistaluojatapa(id, newurl) {
 
