@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Urlerl.JS | kaikkitietokoneista.net</title>
+    <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css">
+    <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style media="screen">
+      body {
+        font-family: helvetica;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="o-container o-container--large">
+
+      <h2 class="c-heading u-xlarge">
+        Urler.JS
+      </h2>
+      <br>
+      <div class="c-input-group">
+        <a href="https://github.com" class="c-button c-button--block c-button--brand">Lähdekoodi</a>
+        <a href="https://roy.takanen.eu" class="c-button c-button--block c-button--info">Tekijä</a>
+      </div>
+      <br>
+      <div class="c-input-group">
+        <div class="o-field">
+          <form class="" action="/" method="get">
+            <input class="c-field" name="new" placeholder="Pitkä osoite...">
+          </form>
+        </div>
+        <input type="submit" class="c-button c-button--brand" value="Lyhennä">
+      </div>
+
+      <hr>
+
+      <table class="c-table c-table--striped">
+        <caption class="c-table__caption">Uusimmat lyhennetyt urlit</caption>
+        <thead class="c-table__head">
+          <tr class="c-table__row c-table__row--heading">
+            <th class="c-table__cell">Lyhennetty</th>
+            <th class="c-table__cell">Alkuperäinen</th>
+          </tr>
+        </thead>
+        <tbody class="c-table__body">
+        </tbody>
+      </table>
+      <span id="shortenetatut" class="c-table--striped"></span>
+    </div>
+    <script type="text/javascript">
+      $.get('/?list=yes', function (data) {
+        data.forEach((item, i) => {
+          $("#shortenetatut").prepend('<tr class="c-table__row"><td class="c-table__cell"><a href="?go=' + item.lyhennetty + '">' + item.lyhennetty + '</a></td><td class="c-table__cell"><a href="'+ item.oikeaosoite + '">'+ item.oikeaosoite + "</a></td></td>");
+        });
+      });
+    </script>
+  </body>
+</html>
