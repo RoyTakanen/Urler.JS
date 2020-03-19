@@ -1,0 +1,31 @@
+{
+  "name": "urlerl.js",
+  "version": "1.0.0",
+  "description": "Urlerl JS on urlien lyhennysohjelma, joka käyttää Node.JS:ää ja MySQL:ää.",
+  "main": "index.js",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "url-exists": "^1.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaikkitietokoneista/Urlerl.JS.git"
+  },
+  "keywords": [
+    "Urler",
+    "Url",
+    "shortener",
+    "express",
+    "Urler.JS"
+  ],
+  "author": "Kaikkitietokoneista",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kaikkitietokoneista/Urlerl.JS/issues"
+  },
+  "homepage": "https://github.com/kaikkitietokoneista/Urlerl.JS#readme"
+}
