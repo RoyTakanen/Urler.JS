@@ -133,3 +133,5 @@ http.createServer(function(req, res) {
 
   }
 }).listen(port);
+
+console.log("Palvelin portissa " + port);
