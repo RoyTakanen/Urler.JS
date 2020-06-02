@@ -5,7 +5,7 @@
 
 Siirrä alla oleva data tiedostoon nimeltä stack.yml:
 ```
-version: '1.0'
+version: '3.1'
 
 services:
    db:
@@ -36,5 +36,5 @@ volumes:
 ```
 
 ```bash
-docker-compose -f stack.yml
+docker-compose -f stack.yml up
 ```
