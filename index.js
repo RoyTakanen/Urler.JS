@@ -20,6 +20,28 @@ const yhdistystiedot = {
   database: DB_NAME
 }
 
+const yhdistys = mysql.createConnection(yhdistystiedot);
+
+yhdistys.connect(function(err) {
+  if (err) {
+    return console.error('error: ' + err.message);
+  }
+
+  let createTodos = `CREATE TABLE if not exists urlit (lyhennetty VARCHAR(255), oikeaosoite VARCHAR(255));`;
+  yhdistys.query(createTodos, function(err, results, fields) {
+    if (err) {
+      console.log(err.message);
+    }
+  });
+
+  yhdistys.end(function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
+  });
+});
+
+
 function yhdistaluojatapa(id, newurl) {
 
   const yhdistys = mysql.createConnection(yhdistystiedot);
