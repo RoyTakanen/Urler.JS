@@ -6,14 +6,23 @@ const fs = require('fs');
 
 const port = process.env.PORT || 8888;
 
+const {
+  DB_USER,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_NAME
+} = process.env;
+
+const yhdistystiedot = {
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME
+}
+
 function yhdistaluojatapa(id, newurl) {
 
-  const yhdistys = mysql.createConnection({
-    host: "54.37.8.79",
-    user: "admin__urler",
-    password: "bGkeEemdRS",
-    database: "admin__urler"
-  });
+  const yhdistys = mysql.createConnection(yhdistystiedot);
 
   yhdistys.connect(function(err) {
     if (err) throw err;
@@ -28,12 +37,7 @@ function yhdistaluojatapa(id, newurl) {
 }
 
 function yhdistaetsijatapa(id, callback) {
-  const yhdistys = mysql.createConnection({
-    host: "54.37.8.79",
-    user: "admin__urler",
-    password: "bGkeEemdRS",
-    database: "admin__urler"
-  });
+  const yhdistys = mysql.createConnection(yhdistystiedot);
 
   yhdistys.connect(function(err) {
     if (err) throw err;
@@ -48,12 +52,7 @@ function yhdistaetsijatapa(id, callback) {
 }
 
 function yhdistaetsiosajatapa(callback) {
-  const yhdistys = mysql.createConnection({
-    host: "54.37.8.79",
-    user: "admin__urler",
-    password: "bGkeEemdRS",
-    database: "admin__urler"
-  });
+  const yhdistys = mysql.createConnection(yhdistystiedot);
 
   yhdistys.connect(function(err) {
     if (err) throw err;
