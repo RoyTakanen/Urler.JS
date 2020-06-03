@@ -124,9 +124,6 @@ http.createServer(function(req, res) {
           res.end("");
         } else {
           res.writeHead(200, {'Content-Type': 'text/html'});
-          res.write(fs.readFileSync('eioleolemassa.html','utf8'))
-          res.end("");
-          res.writeHead(200, {'Content-Type': 'text/html'});
           res.write('<!DOCTYPE html> <html lang="fi" dir="ltr"> <head> <meta charset="utf-8"> <title>Urlerl.JS | kaikkitietokoneista.net</title> <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css"> <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script> <style media="screen"> body { font-family: helvetica; } </style> </head> <body> <div class="o-container o-container--large"><h2 class="c-heading u-xlarge"> Urler.JS - Virhe </h2> <br> <blaze-alert open type="error">Antamasi URL on virheellinen!</blaze-alert> </div> </body> </html> ');
           res.end('')
         }
