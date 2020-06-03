@@ -4,14 +4,13 @@
 ## Käyttäminen (Docker)
 
 Siirrä alla oleva data tiedostoon nimeltä stack.yml:
-```
+```yml
 version: '3.1'
 
 services:
    db:
+     container_name: Urler.JS-MySQL
      image: mysql:5.7
-     volumes:
-       - db_data:/var/lib/mysql
      restart: always
      environment:
        MYSQL_ROOT_PASSWORD: tVDYetk3Ms #Vaihda
@@ -20,19 +19,18 @@ services:
        MYSQL_PASSWORD: tVDYetk3Ms #Vaihda
 
    urlerjs:
+     container_name: Urler.JS-HTTP
      depends_on:
        - db
      image: kaikkitietokoneista/urlerjs:latest
      ports:
-       - "8000:80"
+       - "8888:8888"
      restart: always
      environment:
        DB_HOST: db
        DB_USER: urlerjs
        DB_PASSWORD: tVDYetk3Ms
        DB_NAME: urlerjs
-volumes:
-    db_data: {}
 ```
 
 ```bash
