@@ -8,6 +8,7 @@ const ejs = require('ejs');
 
 const app = express();
 const port = process.env.PORT;
+const hostnameportcombo = process.env.HOSTNAMEPORTCOMBO;
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -126,7 +127,7 @@ app.get('/new',function (req, res) {
       yhdistaluojatapa(id, newurl);
 
       res.render('luotu', {
-        uri: `https://${req.hostname}/go?id=${id}`
+        uri: `https://${hostnameportcombo}/go?id=${id}`
       })
     } else {
       res.render('eioleolemassa')

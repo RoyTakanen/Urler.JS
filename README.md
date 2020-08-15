@@ -24,9 +24,11 @@ services:
        - db
      image: kaikkitietokoneista/urlerjs:latest
      ports:
-       - "8888:8888"
+       - "80:80"
      restart: always
      environment:
+       PORT: 80
+       HOSTNAMEPORTCOMBO: urler.ml #tämä näkyy muodostuneissa urleissa
        DB_HOST: db
        DB_USER: urlerjs
        DB_PASSWORD: tVDYetk3Ms
