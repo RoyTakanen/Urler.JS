@@ -1,10 +1,16 @@
-const http = require('http');
 const url = require('url');
 const mysql = require('mysql');
 const urlExists = require("url-exists");
 const fs = require('fs');
+const express = require('express');
+const path = require('path');
 
-const port = process.env.PORT || 8888;
+
+const app = express();
+const port = process.env.PORT;
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 const {
   DB_USER,
@@ -49,7 +55,7 @@ function yhdistaluojatapa(id, newurl) {
   yhdistys.connect(function(err) {
     if (err) throw err;
 
-    var sql = "INSERT INTO urlit (lyhennetty, oikeaosoite) VALUES ('" + id + "', '" + newurl + "')";
+    let sql = "INSERT INTO urlit (lyhennetty, oikeaosoite) VALUES ('" + id + "', '" + newurl + "')";
     yhdistys.query(sql, function (err, result) {
       if (err) throw err;
       console.log("Uusi Urler.JS urli tehty! :D");
@@ -64,7 +70,7 @@ function yhdistaetsijatapa(id, callback) {
   yhdistys.connect(function(err) {
     if (err) throw err;
 
-    var sql = "SELECT * FROM urlit WHERE lyhennetty='" + id + "';";
+    let sql = "SELECT * FROM urlit WHERE lyhennetty='" + id + "';";
     yhdistys.query(sql, function (err, result, fields) {
       if (err) throw err;
       yhdistys.destroy();
@@ -79,7 +85,7 @@ function yhdistaetsiosajatapa(callback) {
   yhdistys.connect(function(err) {
     if (err) throw err;
 
-    var sql = "SELECT * FROM urlit ORDER BY oikeaosoite LIMIT 20;";
+    let sql = "SELECT * FROM urlit ORDER BY oikeaosoite LIMIT 20;";
     yhdistys.query(sql, function (err, result, fields) {
       if (err) throw err;
       yhdistys.destroy();
@@ -94,10 +100,10 @@ yhdistaetsijatapa("CzDxSK", function(vastaus) {
 }); */
 
 function luoid(length) { //Tee oma versio. Tällä hetkellä kiitos Stackoverflow
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
+   let result           = '';
+   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   let charactersLength = characters.length;
+   for ( let i = 0; i < length; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
    return result;
@@ -105,60 +111,52 @@ function luoid(length) { //Tee oma versio. Tällä hetkellä kiitos Stackoverflo
 
 //Siirrä muutkin funktioiksi
 
-http.createServer(function(req, res) {
+app.get('/',function (req, res) {
+  res.render('index')
+});
 
-  var query = url.parse(req.url, true)
-  if (query.search != null) {
-    if (query.query.new != null) {
+//app.get('/new/:url',function (req, res) {
+//let newurl = req.params.url;
+app.get('/new',function (req, res) {
+  let newurl = req.query.url;
+  urlExists(newurl, function(err, exists) {
+    if (exists) {
+      let id = luoid(6)
 
-      var newurl = query.query.new;
+      yhdistaluojatapa(id, newurl);
 
-      urlExists(newurl, function(err, exists) {
-        if (exists) {
-          var id = luoid(6)
+      res.render('luotu', {
+        uri: `https://${host}/go?id=${id}`
+      })
+    } else {
+      res.render('eioleolemassa')
+    }
+  });
+});
 
-          yhdistaluojatapa(id, newurl);
-
-          res.writeHead(200, {'Content-Type': 'text/html'});
-          res.write('<!DOCTYPE html> <html lang="fi" dir="ltr"> <head> <meta charset="utf-8"> <title>Urlerl.JS | kaikkitietokoneista.net</title> <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css"> <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script> <style media="screen"> body { font-family: helvetica; } </style> </head> <body> <div class="o-container o-container--large"><h2 class="c-heading u-xlarge"> Urler.JS - Onnistui </h2> <br> <blaze-alert open type="success">Lyhennetty URL on luotu:<br><input class="c-field" value="http://localhost:8888/?go=' + id + '" type="text" /></blaze-alert> </div> </body> </html> ');
-          res.end("");
+//app.get('/go/:id', function (req, res) {
+//  if (req.params.id) {
+app.get('/go', function (req, res) {
+  let id = req.query.id;
+  if (id) {
+    try {
+      yhdistaetsijatapa(id, function(vastaus) {
+        if (vastaus != undefined) {
+          res.redirect(301,vastaus)
         } else {
-          res.writeHead(200, {'Content-Type': 'text/html'});
-          res.write('<!DOCTYPE html> <html lang="fi" dir="ltr"> <head> <meta charset="utf-8"> <title>Urlerl.JS | kaikkitietokoneista.net</title> <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css"> <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script> <style media="screen"> body { font-family: helvetica; } </style> </head> <body> <div class="o-container o-container--large"><h2 class="c-heading u-xlarge"> Urler.JS - Virhe </h2> <br> <blaze-alert open type="error">Antamasi URL on virheellinen!</blaze-alert> </div> </body> </html> ');
-          res.end('')
+          res.render('eioleolemassa')
         }
       });
-    } else if (query.query.go != null) {
-      try {
-        yhdistaetsijatapa(query.query.go, function(vastaus) {
-          if (vastaus != undefined) {
-            res.writeHead(301, {'Location' : vastaus});
-            res.end('');
-          } else {
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write('<!DOCTYPE html> <html lang="fi" dir="ltr"> <head> <meta charset="utf-8"> <title>Urlerl.JS | kaikkitietokoneista.net</title> <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css"> <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script> <style media="screen"> body { font-family: helvetica; } </style> </head> <body> <div class="o-container o-container--large"><h2 class="c-heading u-xlarge"> Urler.JS - Virhe </h2> <br> <blaze-alert open type="error">Antamasi URL on virheellinen!</blaze-alert> </div> </body> </html> ');
-            res.end('');
-          }
-        });
-      } catch (e) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write('<!DOCTYPE html> <html lang="fi" dir="ltr"> <head> <meta charset="utf-8"> <title>Urlerl.JS | kaikkitietokoneista.net</title> <link rel="stylesheet" href="https://unpkg.com/@blaze/css@x.x.x/dist/blaze/blaze.css"> <script src="https://unpkg.com/@blaze/atoms@x.x.x/dist/blaze-atoms.js"></script> <style media="screen"> body { font-family: helvetica; } </style> </head> <body> <div class="o-container o-container--large"><h2 class="c-heading u-xlarge"> Urler.JS - Virhe </h2> <br> <blaze-alert open type="error">Antamasi URL on virheellinen!</blaze-alert> </div> </body> </html> ');
-        res.end('');
-      }
-    } else if (query.query.list != null) {
-      yhdistaetsiosajatapa(function(vastaus) {
-        res.writeHead(200, {'Content-Type': 'text/json'});
-        res.write(" " + JSON.stringify(vastaus));
-        res.end("");
-      })
+    } catch (e) {
+      res.render('eioleolemassa')
     }
   } else {
-
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(fs.readFileSync('index.html','utf8'))
-    res.end("");
-
+    res.redirect(301,'/')
   }
-}).listen(port);
+});
+
+app.listen(port, () => {
+  console.log(`Server is listening on ${port}`);
+});
 
 console.log("Palvelin portissa " + port);
