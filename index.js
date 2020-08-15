@@ -126,7 +126,7 @@ app.get('/new',function (req, res) {
       yhdistaluojatapa(id, newurl);
 
       res.render('luotu', {
-        uri: `https://${host}/go?id=${id}`
+        uri: `https://${req.hostname}/go?id=${id}`
       })
     } else {
       res.render('eioleolemassa')
