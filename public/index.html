@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tiny.tf</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/blaze@3.6.3/dist/blaze.min.css">
+    <script type="module" src="https://unpkg.com/@blaze/atoms@12.0.0//dist/blaze-atoms/blaze-atoms.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/@blaze/atoms@12.0.0//dist/blaze-atoms/blaze-atoms.js"></script>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bottom {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .right {
+            right: 0;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="alerts">
+        <!-- Send error report to email or to kv automatically -->
+    </div>
+    <div class="u-center-block" style="min-height: 40vh;">
+        <div class="u-center-block__content">
+            <div class="c-input-group" id="longgroup">
+                <div class="o-field">
+                    <input class="c-field u-xlarge" placeholder="https://example.com/very-long-url..."
+                        style="min-width: 40vw;" id="longurl">
+                </div>
+                <button class="c-button c-button--brand u-xlarge" id="shortener">Shorten</button>
+            </div>
+        </div>
+    </div>
+    <div class="u-center-block">
+        <div class="u-center-block__content">
+            <div id="shortened"></div>
+        </div>
+    </div>
+    <div class="o-grid bottom">
+        <div class="o-grid__cell">
+            <div class="o-grid-text" id="linkBox"></div>
+        </div>
+        <div class="o-grid__cell right">
+            <div class="o-grid-text" id="rightStatBox"></div>
+        </div>
+    </div>
+
+    <script>
+        const mode = (arr) => {
+            return arr.sort((a, b) =>
+                arr.filter(v => v === a).length
+                - arr.filter(v => v === b).length
+            ).pop();
+        }
+
+        const isValidURL = (url) => {
+            let res = url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+            return (res !== null);
+        }
+
+
+        window.onload = async => {
+            // Might want to do this in head tag to optimize 
+
+            fetch('/stats')
+                .then(response => response.json())
+                .then(stats => {
+                    let linkBox = document.getElementById('linkBox');
+                    linkBox.innerHTML = `<blaze-counter id="linkCounter" class="u-super u-text--mono" auto-start start-value="0" end-value="${stats.linkCount}" duration="7" decimals="0"><span slot="suffix" class="u-text--quiet u-xsmall"> links shortened</span></blaze-counter>`
+
+                    // Maybe try to find way to show average shortening time
+                    let rightStatBox = document.getElementById('rightStatBox');
+                    const countries = stats.countries.filter(country => country != null);
+                    const popularCountry = mode(countries);
+                    console.log(popularCountry)
+                    rightStatBox.innerHTML = `<div class="u-super u-text--mono hydrated"><span class="c-counter__prefix"></span><span class="c-counter__amount">${popularCountry}</span><span class="c-counter__suffix"><span slot="suffix" class="u-text--quiet u-xsmall"> has shortened most of the links</span></span></div>`
+                });
+        };
+
+        document.getElementById('shortener').addEventListener('click', async function () {
+            let longUrl = document.getElementById('longurl');
+            let shortened = document.getElementById('shortened');
+            let longGroup = document.getElementById('longgroup');
+
+            longUrl.classList.remove('c-field--success');
+            longUrl.classList.remove('c-field--error');
+            longGroup.classList.remove('animate__animated');
+            longGroup.classList.remove('animate__headShake');
+            shortened.innerHTML = "";
+
+            if (isValidURL(longUrl.value)) {
+                longUrl.classList.add('c-field--success');
+
+                const rawResponse = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: longUrl.value
+                    })
+                });
+                const content = await rawResponse.json();
+
+                if ("error" in content || rawResponse.status != 200) {
+                    let alerts = document.getElementById('alerts');
+                    alerts.innerHTML = "";
+                    alerts.innerHTML = `<blaze-alert open type="error">You should not encounter this error message. This means our user interface is bugging out. If you are a legitimate user please contact us at info@${window.location.hostname}. If you are a pentester use the same email address to report your findings.</blaze-alert>`
+                } else {
+                    shortened.innerHTML = "";
+                    let shortHeading = document.createElement('h1');
+                    shortHeading.classList.add('animate__animated');
+                    shortHeading.classList.add('animate__fadeInLeft');
+                    shortHeading.innerHTML = "shortened link: " + `<input class="c-field u-small" style="min-width: 40vw" value="${window.location.protocol}//${content.domain}/${content.id}" type="text" disabled/>`
+                    shortened.append(shortHeading);
+                }
+            } else {
+                longUrl.classList.add('c-field--error');
+
+                longGroup.classList.add('animate__animated');
+                longGroup.classList.add('animate__headShake');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
