@@ -11,7 +11,7 @@ Url shortening service with focus on blazing fast speeds. Deployed as a CloudFla
 
 Example:
 
-```json
+```toml
 account_id = "<YOUR_ACCOUNT_ID>"
 name = "tinytf"
 type = "webpack"
